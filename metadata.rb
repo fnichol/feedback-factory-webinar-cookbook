@@ -1,0 +1,7 @@
+name 'feedback-factory'
+maintainer 'Chef Software Inc.'
+maintainer_email 'fnichol@chef.io'
+license 'apache2'
+description 'Installs/Configures feedback-factory'
+long_description 'Installs/Configures feedback-factory'
+version '0.1.0'
