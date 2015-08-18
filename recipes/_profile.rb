@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: feedback-factory
-# Spec:: default
+# Recipe:: _profile
 #
 # Copyright 2015 Chef Software Inc.
 #
@@ -16,17 +16,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'spec_helper'
+if platform_family?('windows')
+  profile = Chef::Util::Powershell::Cmdlet.new(node, '$PROFILE').
+    run.return_value.chomp
+  vm_name = node['feedback-factory']['windows']['docker']['vm_name']
 
-describe 'feedback-factory::default' do
-  context 'When all attributes are default, on an unspecified platform' do
-    let(:chef_run) do
-      runner = ChefSpec::ServerRunner.new
-      runner.converge(described_recipe)
-    end
+  directory File.dirname(profile) do
+    recursive true
+  end
 
-    it 'converges successfully' do
-      expect { chef_run }.to_not raise_error
-    end
+  file profile do
+    content <<-PROFILE.gsub(/^ {6}/, '')
+      docker-machine env --shell powershell #{vm_name} | iex
+      chef shell-init powershell | iex
+    PROFILE
+  end
+else
+  file ::File.join(ENV['HOME'], '.bash_aliases') do
+    content <<-PROFILE.gsub(/^ {6}/, '')
+      eval $(chef shell-init bash)
+    PROFILE
   end
 end

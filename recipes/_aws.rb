@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: feedback-factory
-# Spec:: default
+# Recipe:: _aws
 #
 # Copyright 2015 Chef Software Inc.
 #
@@ -16,17 +16,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'spec_helper'
+ssh_key = ::File.join(ENV['HOME'], ".ssh", "id_rsa")
+username = node['feedback-factory']['username']
 
-describe 'feedback-factory::default' do
-  context 'When all attributes are default, on an unspecified platform' do
-    let(:chef_run) do
-      runner = ChefSpec::ServerRunner.new
-      runner.converge(described_recipe)
-    end
+directory ::File.dirname(ssh_key) do
+  recursive true
+  owner username
+  group username
+end
 
-    it 'converges successfully' do
-      expect { chef_run }.to_not raise_error
-    end
-  end
+file ssh_key do
+  content node['feedback-factory']['aws_ssh_key'].gsub("\\n", "\n")
+  owner username
+  group username
+  mode "0600"
 end

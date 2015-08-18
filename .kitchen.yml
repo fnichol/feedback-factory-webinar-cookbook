@@ -1,16 +1,63 @@
 ---
-driver:
-  name: vagrant
+<% require "json"; @remote = JSON.parse(`docker-machine inspect remote`); %>
 
 provisioner:
-  name: chef_zero
+  name: chef_solo
+  chef_omnibus_install_options: -P chefdk
+
+transport:
+  ssh_key: <%= ENV.fetch("AWS_SSH_KEY") { raise "You must set AWS_SSH_KEY" } %>
 
 platforms:
-  - name: ubuntu-14.04
-  - name: centos-7.1
+  - name: debian-8.1
+    driver:
+      name: ec2
+      region: us-west-2
+      image_id: ami-ed8eb7dd
+      iam_profile_name: <%= ENV.fetch("AWS_IAM_PROFILE") { raise "You must set AWS_IAM_PROFILE" }%>
+      tags:
+        X-Project: chef-client
+        X-SubProject: feedback-factory
+        created-by: test-kitchen
+      http_proxy:
+      https_proxy:
+    transport:
+      username: admin
+      http_proxy:
+      https_proxy:
+    provisioner:
+      chef_omnibus_root: /opt/chefdk
+      http_proxy:
+      https_proxy:
+      attributes:
+        feedback-factory:
+          aws_ssh_key: <%= IO.read(ENV.fetch("AWS_SSH_KEY") { raise "You must set AWS_SSH_KEY" }).gsub("\n", "\\n") %>
+          username: admin
+          kitchen:
+            region: us-west-2
+            instance_type: m4.large
+            iam_profile_name: <%= ENV.fetch("AWS_IAM_PROFILE") { raise "You must set AWS_IAM_PROFILE" }%>
+            aws_ssh_key_id: <%= ENV.fetch("AWS_SSH_KEY_ID") { raise "You must set AWS_SSH_KEY_ID" }%>
+            tags:
+              X-Project: chef-client
+              X-SubProject: feedback-factory
+              created-by: test-kitchen
+            retryable_tries: 120
+  - name: windows-2012r2
+    driver:
+      name: vagrant
+      gui: false
+    provisioner:
+      chef_omnibus_root: $env:systemdrive\opscode\chefdk
+      attributes:
+        feedback-factory:
+          windows:
+            docker:
+              ip_address: <%= @remote["Driver"]["IPAddress"] %>
+              ssh_user: <%= @remote["Driver"]["SSHUser"] %>
+              ssh_port: <%= @remote["Driver"]["SSHPort"] %>
+              ssh_key: <%= IO.read(File.join(@remote["StorePath"], "id_rsa")).gsub("\n", "\\n") %>
 
 suites:
   - name: default
-    run_list:
-      - recipe[feedback-factory::default]
-    attributes:
+    run_list: recipe[feedback-factory]

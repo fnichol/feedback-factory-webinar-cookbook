@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: feedback-factory
-# Spec:: default
+# Recipe:: _chocolatey
 #
 # Copyright 2015 Chef Software Inc.
 #
@@ -16,17 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'spec_helper'
+include_recipe 'chocolatey'
 
-describe 'feedback-factory::default' do
-  context 'When all attributes are default, on an unspecified platform' do
-    let(:chef_run) do
-      runner = ChefSpec::ServerRunner.new
-      runner.converge(described_recipe)
-    end
-
-    it 'converges successfully' do
-      expect { chef_run }.to_not raise_error
-    end
-  end
-end
+chocolatey 'conemu'
+chocolatey 'vim'

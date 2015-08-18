@@ -5,3 +5,8 @@ license 'apache2'
 description 'Installs/Configures feedback-factory'
 long_description 'Installs/Configures feedback-factory'
 version '0.1.0'
+
+depends 'apt'
+depends 'chocolatey'
+depends 'git', '~> 4.2'
+depends 'windows'

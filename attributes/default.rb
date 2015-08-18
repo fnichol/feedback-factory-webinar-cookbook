@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: feedback-factory
-# Spec:: default
+# Attribute:: default
 #
 # Copyright 2015 Chef Software Inc.
 #
@@ -16,17 +16,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'spec_helper'
-
-describe 'feedback-factory::default' do
-  context 'When all attributes are default, on an unspecified platform' do
-    let(:chef_run) do
-      runner = ChefSpec::ServerRunner.new
-      runner.converge(described_recipe)
-    end
-
-    it 'converges successfully' do
-      expect { chef_run }.to_not raise_error
-    end
-  end
-end
+node.default["feedback-factory"]["windows"]["docker"]["toolbox_url"] =
+  "https://github.com/docker/toolbox/releases/download/v1.8.1b/DockerToolbox-1.8.1b.exe"
+node.default["feedback-factory"]["windows"]["docker"]["toolbox_display_name"] =
+  "Docker Toolbox version 1.8.1b"
+node.default["feedback-factory"]["windows"]["docker"]["toolbox_checksum"] =
+  "235e4f64a1a7fdb5695e30245bab3681bd457c8c8c0ae7881f621a5d073ff2de"
+node.default["feedback-factory"]["windows"]["docker"]["vm_name"] = "remote"
